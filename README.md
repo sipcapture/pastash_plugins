@@ -1,3 +1,5 @@
+<img src="http://i.imgur.com/wYjsCqz.png"/>
+
 # paStash Plugins
 NPM Plugin Modules for Pastash
 
