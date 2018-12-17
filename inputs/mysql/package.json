@@ -1,12 +1,15 @@
 {
-  "name": "@pastash/output_stdout",
+  "name": "@pastash/input_mysql",
   "version": "1.0.0",
-  "description": "Stdout Output Plugin for @pastash/pastash",
-  "main": "output_stdout.js",
+  "description": "MySQL Input Plugin for @pastash/pastash",
+  "main": "input_mysql.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "optionalDependencies": {},
   "author": "Lorenzo Mangani <lorenzo.mangan@gmail.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "*"
+  }
 }
