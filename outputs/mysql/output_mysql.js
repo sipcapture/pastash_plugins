@@ -12,10 +12,10 @@ function OutputMySql() {
         optional_params: ['db',  'query', 'host', 'user', 'password', 'port','interval_ms'],
         default_values: {
             'db' : 'officering_core',
-            'host': '192.168.201.221',
+            'host': '127.0.0.1',
             'port': 3306,
             'user': 'root',
-            'password': '00!rtvc!00',
+            'password': 'admin',
             'interval_ms': 10000,
             'qurey': "call SP_UpdateSyncResult('{|data|}');"
         },
