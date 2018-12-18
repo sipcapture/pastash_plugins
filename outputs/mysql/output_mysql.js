@@ -11,7 +11,7 @@ function OutputMySql() {
         name: 'MySql',
         optional_params: ['db',  'query', 'host', 'user', 'password', 'port','interval_ms'],
         default_values: {
-            'db' : 'officering_core',
+            'db' : 'database',
             'host': '127.0.0.1',
             'port': 3306,
             'user': 'root',
