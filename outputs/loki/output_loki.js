@@ -1,5 +1,5 @@
 var abstract_http = require('./abstract_http'),
-  util = require('util').
+  util = require('util'),
   logger = require('@pastash/pastash').logger;
 
 /* Bulk Helper */
