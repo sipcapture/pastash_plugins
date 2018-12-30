@@ -2,6 +2,8 @@ var abstract_http = require('./abstract_http'),
   util = require('util'),
   logger = require('@pastash/pastash').logger;
 
+var recordCache = require('record-cache');
+
 /* Bulk Helper */
 var template = {"streams": [{"labels": "", "entries": [] }]}
 var onStale = function(data){

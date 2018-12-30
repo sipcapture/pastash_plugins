@@ -8,8 +8,6 @@ var base_output = require('@pastash/pastash').base_output,
 function AbstractHttp() {
   base_output.BaseOutput.call(this);
   this.mergeConfig(ssl_helper.config());
-    return 'output HTTP Post to ' + this.host;
-  });
   this.mergeConfig({
     name: 'Abstract Http',
     host_field: 'host',
