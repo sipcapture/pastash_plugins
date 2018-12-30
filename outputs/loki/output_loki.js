@@ -10,7 +10,7 @@ var onStale = function(data){
 	     line.streams[0].labels = key;
  	     value.list.forEach(function(row){
 		// add to array
-		line.streams[0].entries.push({ "ts": new Date().toISOString(), "line": row  });
+		line.streams[0].entries.push({ "ts": row['@timestamp']||new Date().toISOString(), "line": row  });
              });
 
  	     var path = this.replaceByFields(data, this.path);
