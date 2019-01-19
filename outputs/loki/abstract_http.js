@@ -53,9 +53,6 @@ AbstractHttp.prototype.sendHttpRequest = function(http_options, body) {
     if (res.statusCode < 200 || res.statusCode > 299) {
       logger.error('error', 'Wrong HTTP Post return code: ' + res.statusCode);
     }
-    else {
-      logger.error('ok');
-    }
     res.on('data', function() {});
   }.bind(this);
 
