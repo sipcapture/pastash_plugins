@@ -27,7 +27,7 @@ LokiPost.prototype.start = function(callback) {
         for (let [key, value] of data.records.entries()) {
              if(!value.list[0]) return;
              var line = {"streams": [{"labels": "", "entries": [] }]};
-             line.streams[0].labels="__filename__=\""+key+"\""
+             line.streams[0].labels = key;
              value.list.forEach(function(row){
                 // add to array
                 row = row.record;
@@ -73,7 +73,16 @@ LokiPost.prototype.start = function(callback) {
 util.inherits(LokiPost, abstract_http.AbstractHttp);
 
 LokiPost.prototype.process = function(data) {
-        cache.add(data.path,data);
+        // Group by Labels fingerprint        
+        var labels = [];
+        const stripped = Object.entries(data)
+                .filter(([key]) => !['message', '@timestamp', '@version'].includes(key))
+                .reduce((data, [key, val]) => Object.assign(data, { [key]: val }), {});
+        Object.keys(stripped).forEach(key => {
+          labels.push( key+"=\""+stripped[key]+"\"" );
+        });
+        var fingerprint = "{"+labels.join(',')+"}";
+        cache.add(fingerprint,data);
 };
 
 LokiPost.prototype.to = function() {
