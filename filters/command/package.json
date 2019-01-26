@@ -1,6 +1,6 @@
 {
   "name": "@pastash/filter_command",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Command Plugin for @pastash/pastash",
   "main": "filter_command.js",
   "scripts": {

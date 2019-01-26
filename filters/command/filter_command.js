@@ -13,10 +13,11 @@ function FilterCommand() {
   base_filter.BaseFilter.call(this);
   this.mergeConfig({
     name: 'Command',
-    optional_params: ['debug', 'cmd', 'plugins', 'field', 'bypass'],
+    optional_params: ['debug', 'cmd', 'plugins', 'field', 'bypass', 'strict'],
     default_values: {
       'debug': false,
       'bypass': false,
+      'strict': false,
       'field': 'message',
       'plugins': [],
     },
@@ -36,27 +37,25 @@ FilterCommand.prototype.start = function(callback) {
         if (this.debug) logger.debug('Initialized Plugin Commands',Object.keys(exec()));
     } catch(e) { logger.error(e) }
   }
-  logger.info('Initialized App Command');
+  logger.info('Initialized Plug Command');
   callback();
 };
 
 FilterCommand.prototype.process = function(data) {
 
-  if(!this.cmd) return;
+  if(!this.cmd && !this.bypass) return;
   try {
-	var dataset = JSON.parse(data[this.field]);
-        if (!dataset.filter) { logger.error('No Data Array - Bypass'); return; }
-        if (this.debug) logger.info('GOT DATA',dataset);
+	data = JSON.parse(data[this.field]);
+        if (this.debug) logger.info('COMMAND IN',data);
         // command
-        var command = "return exec()" + this.cmd + ".data(dataset)";
-        var run = new Function('exec','dataset', command).bind(this);
-        var out = run(exec,dataset);
-        if (this.debug) logger.info('OUTPUT',out);
-        this.emit('data',out);
+        var command = "return exec()" + this.cmd + ".data(data)";
+        var run = new Function('exec','data', command).bind(this);
+        var out = run(exec,data);
+        if (this.debug) logger.info('COMMAND OUT',out);
+	return out;
    } catch(e){
         if (this.debug) logger.info(e);
-        if (this.bypass) this.emit('data',data);
-        return;
+        if (this.bypass) return data;
    }
 
 };
