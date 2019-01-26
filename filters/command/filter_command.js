@@ -43,8 +43,8 @@ FilterCommand.prototype.start = function(callback) {
 FilterCommand.prototype.process = function(data) {
 
   if(!this.cmd) return;
-  var dataset = JSON.parse(data[this.field]);
   try {
+	var dataset = JSON.parse(data[this.field]);
         if (!dataset.filter) { logger.error('No Data Array - Bypass'); return; }
         if (this.debug) logger.info('GOT DATA',dataset);
         // command
