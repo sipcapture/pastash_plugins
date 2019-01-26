@@ -1,5 +1,5 @@
 # PaStash Command Filter
-This is an experimental filter executing a pipeline of commands against the pass-through array of objects.
+This is an experimental filter executing a pipeline of commands against an array of objects, emitting results.
 
 
 ### Usage Example
