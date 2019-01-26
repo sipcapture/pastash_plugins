@@ -1,6 +1,6 @@
 <img src="http://i.imgur.com/wYjsCqz.png"/>
 
-# paStash Plugins
+# paStash condiments
 NPM Plugin Modules for Pastash NG (@pastash/pastash)
 
 
