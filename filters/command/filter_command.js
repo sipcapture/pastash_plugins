@@ -13,9 +13,11 @@ function FilterCommand() {
   base_filter.BaseFilter.call(this);
   this.mergeConfig({
     name: 'Command',
-    optional_params: ['debug', 'cmd', 'plugins'],
+    optional_params: ['debug', 'cmd', 'plugins', 'field', 'bypass'],
     default_values: {
       'debug': false,
+      'bypass': false,
+      'field': message,
     },
     start_hook: this.start,
   });
@@ -34,20 +36,22 @@ FilterCommand.prototype.start = function(callback) {
 FilterCommand.prototype.process = function(data) {
 
   if(!this.cmd) return;
-  var dataset = data.message || data;
+  var dataset = JSON.parse(data[this.field]);
   try {
-	// command
-	var command = "return exec()" + this.cmd + ".data(data)";
-	var run = new Function('exec','data', command);
-	var out = run(exec,dataset);
-	if (debug) logger.info(command,out);
-	this.emit('data',out);
-
+        if (!dataset.filter) { logger.error('No Data Array - Bypass'); return; }
+        if (this.debug) logger.info('GOT DATA',dataset);
+        // command
+        var command = "return exec()" + this.cmd + ".data(dataset)";
+        var run = new Function('exec','dataset', command).bind(this);
+        var out = run(exec,dataset);
+        if (this.debug) logger.info('OUTPUT',out);
+        this.emit('data',out);
    } catch(e){
-	if (this.debug) logger.info(e);
-	this.emit('data',dataset);
-	return;
+        if (this.debug) logger.info(e);
+        if (this.bypass) this.emit('data',data);
+        return;
    }
+
 };
 
 exports.create = function() {
