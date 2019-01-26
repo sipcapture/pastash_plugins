@@ -1,6 +1,6 @@
 {
   "name": "@pastash/command_math",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Command Math for PaStash Commands",
   "main": "command_math.js",
   "scripts": {

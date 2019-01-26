@@ -1,21 +1,27 @@
 module.exports = function plugin() {
 
   this.multiply = function(a,b,data) {
-    var sin = false;
-    if(!Array.isArray(data)) { data = [data]; sin = true; }
+    // Everything is an Array
+    if(!Array.isArray(data)) { data = [data]; }
     for (var set of data) {
       if(set[a]) set[a] = set[a] * b
     }
-    return sin ? data[0] : data;
+    // Apply Data
+    this.data(data);
+    // Return Chain
+    return this;
   }
 
   this.divide = function(a,b,data) {
-    var sin = false;
-    if(!Array.isArray(data)) { data = [data]; sin = true; }
+    // Everything is an Array
+    if(!Array.isArray(data)) { data = [data]; }
     for (var set of data) {
       if(set[a]) set[a] = set[a] / b
     }
-    return sin ? data[0] : data;
+    // Apply Data
+    this.data(data);
+    // Return Chain
+    return this;
   }
 
 }
