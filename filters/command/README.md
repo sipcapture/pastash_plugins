@@ -14,8 +14,8 @@ filter {
   command {
     debug => true
     field => message
-    plugins => [require('@pastash/command_chain')]
-    cmd => ".filter('eyes', 'brown').groupBy('sex')"
+    plugins => ['@pastash/command_chain']
+    cmd => ".filter('eyes', 'brown').chain().groupBy('sex')"
   }
 }
 

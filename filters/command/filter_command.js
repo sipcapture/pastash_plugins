@@ -17,7 +17,8 @@ function FilterCommand() {
     default_values: {
       'debug': false,
       'bypass': false,
-      'field': message,
+      'field': 'message',
+      'plugins': [],
     },
     start_hook: this.start,
   });
@@ -26,8 +27,14 @@ function FilterCommand() {
 util.inherits(FilterCommand, base_filter.BaseFilter);
 
 FilterCommand.prototype.start = function(callback) {
-  if(this.plugins && this.plugins[0]) {
-	exec = exec().plug(this.plugins);
+  if(this.plugins) {
+    try {
+        var plugs = [];
+        if (!Array.isArray(this.plugins)) this.plugins = [this.plugins];
+        if (this.debug) logger.info('Loading Commands...',this.plugins);
+        this.plugins.forEach(function(plug){ exec = exec().plug( [require(""+plug+"")] ) });
+        if (this.debug) logger.debug('Initialized Plugin Commands',Object.keys(exec()));
+    } catch(e) { logger.error(e) }
   }
   logger.info('Initialized App Command');
   callback();
