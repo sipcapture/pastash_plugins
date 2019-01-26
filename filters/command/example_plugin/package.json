@@ -1,0 +1,11 @@
+{
+  "name": "@pastash/command_chain",
+  "version": "1.0.0",
+  "description": "Command Chain for PaStash Commands",
+  "main": "command_chain.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
