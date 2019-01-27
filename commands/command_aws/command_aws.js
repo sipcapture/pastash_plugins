@@ -1,39 +1,54 @@
-const SolidBucket = require('solid-bucket')
+const s3 = require('s3')
 
 module.exports = function plugin() {
 
-  /*
-   * fetch(u,k,data)
-   *
-   */
-
-  this.awsFetch = function(data) {
+this.awsFetch = function(data) {
+   let downloadedFilePath = '/tmp'
     if(!Array.isArray(data)) { data = [data]; }
     for (var set of data) {
-	if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region) return;
-	let provider = new SolidBucket(set.provider|'aws', {
-	    accessKeyId: set.accessKeyId,
-	    secretAccessKey: set.secretAccessKey,
-	    region: set.region|"us-east-1"
-	})
+      if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region) return;
 
-	if (!provider|!set.remoteFilename) return;
-	let bucketName = set.id || 'fetchBucket'
-	let remoteFilename = set.remoteFilename;
-	let downloadedFilePath = '/tmp'
-	provider.downloadFile(bucketName, remoteFilename, downloadedFilePath).then((resp) => {
-	    if (resp.status === 200) {
-	        //console.log(resp.message)
-		set.executed = true;
-		set.localFilename = downloadedFilepath+"/"+remoteFilename;
-	    }
-	}).catch((resp) => {
-	    if (resp.status === 400){
-	        console.log('ERR',resp.message)
-		set.executed = false;
-		set.response = resp.status;
-	    }
-	})
+      if(set.localFilename){
+        set.localFilename = downloadedFilepath+"/"+set.remoteFilename;
+      } else {
+        return;
+      }
+
+      let bucketName = set.id || 'fetchBucket'
+      let remoteFilename = set.remoteFilename;
+      var client = s3.createClient({
+      	maxAsyncS3: 20,     // this is the default
+      	s3RetryCount: 3,    // this is the default
+      	s3RetryDelay: 1000, // this is the default
+      	multipartUploadThreshold: 20971520, // this is the default (20 MB)
+      	multipartUploadSize: 15728640, // this is the default (15 MB)
+      	s3Options: {
+      	   accessKeyId: set.accessKeyId,
+      	   secretAccessKey:  set.secretAccessKey,
+      	   // any other options are passed to new AWS.S3()
+      	   // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
+      	},
+      });
+      var params = {
+          localFile: set.localFilename ,
+          s3Params: {
+            Bucket:bucketName,
+            Key: remoteFilename,
+            // other options supported by getObject
+            // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#getObject-property
+          },
+        };
+        var downloader = client.downloadFile(params);
+        downloader.on('error', function(err) {
+            console.error("unable to download:", err.stack);
+	    set.error = true;
+	    return;
+        });
+        downloader.on('end', function() {
+            //console.log("done downloading");
+	    return;
+        });
+
     }
     // Apply Data
     this.data(data);
@@ -41,45 +56,6 @@ module.exports = function plugin() {
     return this;
   }
 
-  /*
-   * store(data)
-   *
-   */
-
-  this.awsStore = function(data) {
-    if(!Array.isArray(data)) { data = [data]; }
-    for (var set of data) {
-	if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region) return;
-	let provider = new SolidBucket(set.provider|'aws', {
-	    accessKeyId: set.accessKeyId,
-	    secretAccessKey: set.secretAccessKey,
-	    region: set.region|"us-east-1"
-	})
-
-	if (!provider|!set.localFilename) return;
-
-	let bucketName = set.id || 'storeBucket'
-	provider.uploadFile(bucketName, set.localFilename).then((resp) => {
-	    if (resp.status === 200) {
-	        //console.log(resp.message)
-		set.executed = true;
-	    }
-	}).catch((resp) => {
-	    if (resp.status === 400){
-	        console.log('ERR',resp.message)
-		set.executed = false;
-		set.response = resp.status;
-	    }
-	})
-
-
-    }
-    // Apply Data
-    this.data(data);
-    // Return Chain
-    return this;
-  }
 
 }
-
 

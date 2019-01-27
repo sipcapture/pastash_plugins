@@ -1,6 +1,6 @@
 {
   "name": "@pastash/command_aws",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Command AWS Fetch/Store for PaStash Commands",
   "main": "command_aws.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "solid-bucket": "^2.1.1"
+    "s3": "^4.4.0"
   }
 }
