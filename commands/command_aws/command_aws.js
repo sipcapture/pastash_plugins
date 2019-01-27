@@ -9,9 +9,10 @@ this.awsFetch = function(data) {
       if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region) return;
 
       if(set.localFilename){
-        set.localFilename = downloadedFilepath+"/"+set.remoteFilename;
+        set.localFilename = downloadedFilePath+"/"+set.localFilename;
       } else {
-        return;
+          set.localFilename = downloadedFilePath+"/"+set.remoteFilename;
+
       }
 
       let bucketName = set.id || 'fetchBucket'
@@ -42,12 +43,12 @@ this.awsFetch = function(data) {
         downloader.on('error', function(err) {
             console.error("unable to download:", err.stack);
 	    set.error = true;
-	    return;
+	  //  return;
         });
         downloader.on('end', function() {
             //console.log("done downloading");
-	    return;
-        });
+	  //  return;
+        }.bind(this));
 
     }
     // Apply Data
