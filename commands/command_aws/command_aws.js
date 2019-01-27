@@ -8,7 +8,6 @@ this.awsFetch = function(data) {
     for (var set of data) {
       if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region|!set.remoteFilename) {
 	      set.error = true;
-	      continue;
       }
       if(set.localFilename){
           set.localFilename = downloadedFilePath+"/"+set.localFilename;
@@ -44,7 +43,6 @@ this.awsFetch = function(data) {
         downloader.on('error', function(err) {
             console.error("unable to download:", err.stack);
 	    set.error = true;
-	    continue;
         });
         downloader.on('end', function() {
             //console.log("done downloading");
