@@ -8,6 +8,7 @@ this.awsFetch = function(data) {
     for (var set of data) {
       if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region|!set.remoteFilename) {
 	      set.error = true;
+	      return;
       }
       if(set.localFilename){
           set.localFilename = downloadedFilePath+"/"+set.localFilename;
