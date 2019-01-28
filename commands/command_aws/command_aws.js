@@ -33,13 +33,13 @@ module.exports = function plugin() {
 	});
 
       	let bucketName = set.id || 'fetchBucket'
-	var res = aws.saveObjectToFile(bucket, set.localFilename, set.downloadedFilePath);
+	var res = aws.saveObjectToFile(bucketName, set.localFilename, set.downloadedFilePath);
         console.log(res);
 	if (!res) { set.error = true; }
 	else { set.localFilename = set.downloadedFilePath+"/"+set.localFilename}
 
      });
-     console.log('Done');
+       console.log('Done');
    }
    start();
    // Apply Data
