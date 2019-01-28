@@ -26,6 +26,10 @@ module.exports = function plugin() {
       	if(!set.localFilename){
       	    set.localFilename = set.remoteFilename;
       	}
+	      
+	if(!set.downloadedFilePath){
+      	    set.downloadedFilePath = downloadedFilePath;
+      	}
 
 	var aws = require('aws-s3-promisified')({
 	    accessKeyId: set.accessKeyId,
