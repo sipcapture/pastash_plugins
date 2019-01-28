@@ -9,6 +9,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-s3-promisified": "^2.0.0",
+    "aws-s3-promisified": "^2.0.0"
   }
 }
