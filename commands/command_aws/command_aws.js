@@ -39,8 +39,9 @@ module.exports = function plugin() {
 	else { set.localFilename = set.downloadedFilePath+"/"+set.localFilename}
 
      });
-       console.log('Done');
-   } start();
+     console.log('Done');
+   }
+   start();
    // Apply Data
    this.data(data);
    // Return Chain
