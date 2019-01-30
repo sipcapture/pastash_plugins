@@ -1,6 +1,6 @@
 {
   "name": "@pastash/command_aws",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Command AWS Fetch/Store for PaStash Commands",
   "main": "command_aws.js",
   "scripts": {
