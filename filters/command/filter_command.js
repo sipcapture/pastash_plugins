@@ -11,12 +11,15 @@ var CircularJSON = require('circular-json');
 
 var plug = require('zephyr')
 var  sys = plug();
+// In the below examples we assume fooFunc, barFunc, bazFunc and quzFunc functions look something like this:
+
+
 
 function FilterCommand() {
   base_filter.BaseFilter.call(this);
   this.mergeConfig({
     name: 'Command',
-    optional_params: ['debug', 'cmd', 'plugins', 'field', 'bypass', 'strict'],
+    optional_params: ['debug', 'cmd', 'plugins', 'field', 'bypass', 'strict','fieldCommandList','fieldResultList','commandList'],
     default_values: {
       'debug': false,
       'bypass': false,
@@ -24,6 +27,7 @@ function FilterCommand() {
         'field': 'message',
         'fieldCommandList': 'CommandList',
         'fieldResultList': 'ResultList',
+        'commandList':[],
       'plugins': [],
     },
     start_hook: this.start,
@@ -60,8 +64,6 @@ plugList.forEach(function (pluginName) {
 
 FilterCommand.prototype.process = function(data) {
 self= this;
-if (this.debug) logger.info('COMMANDS in',this.data);
-if(!this.cmd && !this.bypass) return;
 try {
     	data = JSON.parse(data[this.field]);
     	let commandNameList =[]
@@ -75,24 +77,34 @@ try {
     }
   }
   else
-  {   if(this)
-      console.error("cant find "+ this.fieldCommandList +"in Object=>",CircularJSON.stringify(data))
+  {
+      if(this.commandList.length==0){
+      logger.error("cant find "+ this.fieldCommandList +"in Object=>",CircularJSON.stringify(data))
+      }else{
+          this.commandList.forEach(function(command){
+              commandNameList.push(command)
+          })
+      }
+
   }
   let commandArray =[];
   commandNameList.forEach(function (commandName) {
-     commandArray.push(sys[commandName])
+      commandArray.push(sys[commandName])
   })
 
 
 
- data[self.fieldResultList] =[]
- asyncChainable().set('data',data)
-	.series(commandArray)
-	.end(function () {
-	      if (this.debug) logger.info('COMMANDS OUT',this.data);
-	      self.emit('output', this.data);
-	})
-} catch(e){
+      data[self.fieldResultList] =[]
+      asyncChainable().set('data',data)
+          .series(commandArray)
+          .end(function () {
+                  if (this.debug) logger.info('COMMANDS OUT',this.data);
+              self.emit('output', this.data);
+          }
+          )
+
+//	return data;
+   } catch(e){
         if (this.debug) logger.info(e);
         if (this.bypass) return data;
    }
