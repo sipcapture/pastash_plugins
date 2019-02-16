@@ -1,9 +1,8 @@
 {
-  "name": "@pastash/input_amqp",
-
-  "version": "1.0.1",
-  "description": "AMQP Input Plugin for @pastash/pastash",
-  "main": "input_amqp.js",
+  "name": "@pastash/output_amqp",
+  "version": "1.0.0",
+  "description": "RabbitMQ Output Plugin for @pastash/pastash",
+  "main": "output_amqp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

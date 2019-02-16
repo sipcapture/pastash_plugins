@@ -1,9 +1,8 @@
 {
-  "name": "@pastash/input_amqp",
-
-  "version": "1.0.1",
-  "description": "AMQP Input Plugin for @pastash/pastash",
-  "main": "input_amqp.js",
+  "name": "@pastash/output_mysql",
+  "version": "1.0.0",
+  "description": "MySQL Output Plugin for @pastash/pastash",
+  "main": "output_mysql.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +10,6 @@
   "author": "Lorenzo Mangani <lorenzo.mangan@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "*"
+    "mysql2": "*"
   }
 }

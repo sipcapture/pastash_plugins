@@ -1,9 +1,8 @@
 {
-  "name": "@pastash/input_amqp",
-
-  "version": "1.0.1",
-  "description": "AMQP Input Plugin for @pastash/pastash",
-  "main": "input_amqp.js",
+  "name": "@pastash/input_http",
+  "version": "1.0.0",
+  "description": "HTTP Input Plugin for @pastash/pastash",
+  "main": "input_http.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +10,9 @@
   "author": "Lorenzo Mangani <lorenzo.mangan@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "*"
+    "http": "*",
+    "https": "*",
+    "url": "*"
   }
+
 }

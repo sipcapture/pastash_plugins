@@ -1,9 +1,9 @@
-{
-  "name": "@pastash/input_amqp",
 
-  "version": "1.0.1",
-  "description": "AMQP Input Plugin for @pastash/pastash",
-  "main": "input_amqp.js",
+{
+  "name": "@pastash/output_ws",
+  "version": "1.0.0",
+  "description": "WebSocket Output Plugin for @pastash/pastash",
+  "main": "output_ws.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +11,8 @@
   "author": "Lorenzo Mangani <lorenzo.mangan@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "*"
+    "http": "*",
+    "https": "*",
+    "ws": "
   }
 }

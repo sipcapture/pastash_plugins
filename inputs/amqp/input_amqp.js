@@ -1,9 +1,10 @@
 var base_input = require('@pastash/pastash').base_input,
-  amqp_driver = require('./amqp_driver'),
-  ssl_helper = require('./ssl_helper'),
+
+  amqp_driver = require('@pastash/pastash').amqp_driver,
+  ssl_helper = require('@pastash/pastash').ssl_helper,
   util = require('util'),
-  mqtt = require('mqtt'),
-  logger = require('@pastash/pastash').logger;
+  logger =  require('@pastash/pastash').logger;
+
 
 function InputAmqp() {
   base_input.BaseInput.call(this);
