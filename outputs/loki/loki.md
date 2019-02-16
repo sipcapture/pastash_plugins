@@ -26,6 +26,25 @@ output {
 }
 ````
 
+### Hosted Grafana Example
+```
+input {
+  file {
+    path => "/var/log/*"
+  }
+}
+
+output {
+  loki {
+    basic_auth_password => "some_very_secure_password_hash_here"
+    basic_auth_user => "1234"
+    host => "logs-us-west1.grafana.net"
+    port => 80
+    path => "/api/prom/push"
+  }
+}
+```
+
 Parameters:
 
 * ``host``: ip of the target HTTP server. Accepts string (single) or Array (multi-target).
@@ -38,3 +57,5 @@ Parameters:
 * ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
 * ``maxAge``: maximum bulk cache age in milliseconds. Default 1000.
 * ``maxSize``: maximum bulk entries before flush. Default 5000.
+* ``basic_auth_user``: HTTP Basic Auth Username
+* ``basic_auth_password``: HTTP Basic Auth Password
