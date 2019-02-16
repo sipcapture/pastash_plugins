@@ -1,12 +1,12 @@
 <img src="http://i.imgur.com/wYjsCqz.png"/>
 
-# paStash Plugins
-NPM Plugin Modules for Pastash
+# paStash condiments
+NPM Plugin Modules for Pastash NG (@pastash/pastash)
 
 
 ### Notes
 * Only works with exports from `@pastash/pastash` 1.0.44 _and higher_
-* Only works with plugins published in the `@pastash` keyspace _(ideas welcome)_
+* Only works with plugins and commands published in the `@pastash` keyspace
 
 
 ### Usage
