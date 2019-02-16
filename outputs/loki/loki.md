@@ -9,7 +9,7 @@ This plugin is used to send logs to Loki.
 * Grafana + Loki (or cLoki)
 
 
-Config using logstash format:
+### Config using Local Loki
 ````
 input {
   file {
@@ -19,7 +19,7 @@ input {
 
 output {
   loki {
-    host => loki.url
+    host => localhost
     port => 3100
     path => "/api/prom/push"
   }
