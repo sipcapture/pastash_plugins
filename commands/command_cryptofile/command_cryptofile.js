@@ -4,7 +4,6 @@
  */
 
 var encryptor = require('file-encryptor');
-var PluginName = "aes256 File Encryption";
 var conf,
   defaultConf = {
     algorithm: 'aes256',
@@ -19,7 +18,6 @@ module.exports = function plugin(userConf) {
   this.main.encryptFile = function encryptFile(next) {
 
     encryptor.encryptFile(this.data[conf.inputFileField], this.data[conf.outputFileField], this.data[conf.keyField], options, function (err) {
-      this.data[self.fieldResultList].push({ PluginName: PluginName });
       next();
 
     }.bind(this));
@@ -29,7 +27,6 @@ module.exports = function plugin(userConf) {
 
     encryptor.decryptFile(this.data[conf.inputFileField], this.data[conf.outputFileField], this.data[conf.keyField], options, function (err) {
 
-      this.data[self.fieldResultList].push({ PluginName: PluginName });
       next();
 
     }.bind(this));

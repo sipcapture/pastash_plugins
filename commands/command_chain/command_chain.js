@@ -1,6 +1,5 @@
 
 var CircularJSON = require('circular-json');
-var PluginName = 'Chain demo plugin';
 var conf,
     defaultConf = {
         timeout: 3000,
@@ -23,7 +22,6 @@ var demoFuncaion = function (next) {
     console.log(CircularJSON.stringify(this.data));
 
     setTimeout(function () {
-        this.data[self.fieldResultList].push({ PluginName: PluginName });
         next(null, arguments.callee.toString().substr(0, 3) + ' value'); // Continue on with 'foo value', 'bar value' etc.
         console.log(arguments.callee.name)
     }.bind(this), Math.random() * conf.timeout); // After a random wait of up to a second

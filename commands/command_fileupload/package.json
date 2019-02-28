@@ -1,0 +1,11 @@
+{
+  "name": "@pastash/command_fileupload",
+  "version": "1.0.0",
+  "description": "Upload and check file for PaStash Commands",
+  "main": "command_fileupload.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
