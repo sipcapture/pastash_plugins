@@ -4,10 +4,15 @@ Upload and check file command plugin
 Config example:
 ````
 "@voicenter/voicenter_pastash_command_fileupload": {
+    "pluginFieldName": "FieTransfer",
     "inputFileField": "sourceFilePath",
     "outputFileField": "destFilePath",
+    "nameField": "fileName",
     "sizeField": "fileSize",
-    "nameField": "fileName"
+    "host": "host",
+    "usarname": "usarname",
+    "password": "password",
+    "port": "port"
 }
 ````
 
