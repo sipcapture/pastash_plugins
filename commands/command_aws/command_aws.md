@@ -8,8 +8,12 @@ Config example:
     "outputFileField": "destFilePath",
     "nameField": "fileName",
     "bucketField": "fetchBucket",
-    "accessKeyId": "KEY_ID",
-    "secretAccessKey": "KEY"
+    "buckets": {
+        "fetchBucket": {
+            "accessKeyId": "KEY_ID",
+            "secretAccessKey": "KEY"
+        }
+    }
 }
 ````
 

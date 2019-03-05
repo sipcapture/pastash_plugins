@@ -14,9 +14,10 @@ module.exports = function plugin(userConf) {
 
   this.main.s3Fetch = function s3Fetch(next) {
     const data = this.data[conf.pluginFieldName];
+
     const aws = require('aws-s3-promisified')({
-      accessKeyId: conf.accessKeyId,
-      secretAccessKey: conf.secretAccessKey
+      accessKeyId: conf['buckets'][data[conf.bucketField]].accessKeyId,
+      secretAccessKey: conf['buckets'][data[conf.bucketField]].secretAccessKey
     });
     aws.saveObjectToFile(data[conf.bucketField], data[conf.nameField], data[conf.outputFileField] + data[conf.nameField]).then(() => {
       next();
