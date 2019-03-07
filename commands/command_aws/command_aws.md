@@ -20,4 +20,5 @@ Config example:
 Commands list:
 ````
 s3Fetch();
+s3Delete();
 ````

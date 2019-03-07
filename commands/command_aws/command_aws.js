@@ -48,6 +48,22 @@ function saveObjectToFile(bucket, key, path) {
   });
 };
 
+function deleteObject(bucket, key) {
+  return new BluebirdPromise(function (resolve, reject) {
+    var s3 = new AWS.S3();
+    var params = { Bucket: bucket, Key: key };
+
+    s3.deleteObject(params, function (error, data) {
+      if (error) {
+        reject(error);
+      }
+      else {
+        resolve(data);
+      }
+    });
+  });
+};
+
 module.exports = function plugin(userConf) {
   conf = { ...defaultConf, ...userConf };
 
@@ -58,7 +74,6 @@ module.exports = function plugin(userConf) {
       accessKeyId: conf['buckets'][data[conf.bucketField]].accessKeyId,
       secretAccessKey: conf['buckets'][data[conf.bucketField]].secretAccessKey
     });
-
 
     saveObjectToFile(data[conf.bucketField], data[conf.nameField], data[conf.outputFileField] + data[conf.nameField]).then((res) => {
       const remoteMd5 = res.etag.replace(/"/g, '');
@@ -77,6 +92,21 @@ module.exports = function plugin(userConf) {
       })
     }).catch((err) => {
       console.log(err, 'file fetch error');
+    });
+  }
+
+  this.main.s3Delete = function s3Fetch(next) {
+    const data = this.data[conf.pluginFieldName];
+
+    AWS.config.update({
+      accessKeyId: conf['buckets'][data[conf.bucketField]].accessKeyId,
+      secretAccessKey: conf['buckets'][data[conf.bucketField]].secretAccessKey
+    });
+
+    deleteObject(data[conf.bucketField], data[conf.nameField]).then((res) => {
+      next();
+    }).catch((err) => {
+      console.log(err, 'error deleting file');
     });
   }
 
