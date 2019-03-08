@@ -2,82 +2,112 @@
  * S3 Functions for PaStash Commands
  * (C) 2019 QXIP BV
  */
+const AWS = require('aws-sdk');
+const BluebirdPromise = require('bluebird');
+const fs = require("fs");
+const crypto = require("crypto");
 
-const process = async function(set){
-        if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region|!set.remoteFilename) {
-              set.error = true;
-              return set;
-        } else {
+let conf;
+const defaultConf = {
+  pluginFieldName: 'FileFetch',
+  bucketName: 'fetchBucket'
+};
 
-          if(!set.localFilename){
-            set.localFilename = set.remoteFilename;
-          }
-
-          if(!set.downloadedFilePath){
-            set.downloadedFilePath = downloadedFilePath;
-          }
-
-          var aws = require('aws-s3-promisified')({
-            accessKeyId: set.accessKeyId,
-            secretAccessKey: set.secretAccessKey
-          });
-
-          let bucketName = set.id || 'fetchBucket'
-          var res = await aws.saveObjectToFile(bucketName, set.localFilename, set.downloadedFilePath);
-          if (!res) { set.error = true; } else 
-	  { set.error = false; set.localFilename = set.downloadedFilePath+"/"+set.localFilename }
-          return set;
-        }
+function checksum(str, algorithm, encoding) {
+  return crypto
+    .createHash(algorithm || 'md5')
+    .update(str, 'utf8')
+    .digest(encoding || 'hex')
 }
 
-module.exports = function plugin() {
+function saveObjectToFile(bucket, key, path) {
+  return new BluebirdPromise(function (resolve, reject) {
+    var s3 = new AWS.S3();
+    var params = { Bucket: bucket, Key: key };
+    var writeStream = fs.createWriteStream(path);
+    var res = {
+      etag: null,
+      length: null
+    }
 
-  this.s3Fetch =  function(data) {
-     var test = Promise.all( data.map( item => item = process(item) ));
-     this.data(data);
-     return this;
+    s3.getObject(params).on('httpHeaders', function (statusCode, headers) {
+      if (headers.etag) {
+        res.etag = headers.etag;
+      }
+      if (headers['content-length']) {
+        res.length = headers['content-length'];
+      }
+    }).createReadStream().pipe(writeStream);
+
+    writeStream.on('finish', function () {
+      resolve(res);
+    })
+      .on('error', function (err) {
+        reject('Writestream to ' + path + ' did not finish successfully: ' + err);
+      });
+  });
+};
+
+function deleteObject(bucket, key) {
+  return new BluebirdPromise(function (resolve, reject) {
+    var s3 = new AWS.S3();
+    var params = { Bucket: bucket, Key: key };
+
+    s3.deleteObject(params, function (error, data) {
+      if (error) {
+        reject(error);
+      }
+      else {
+        resolve(data);
+      }
+    });
+  });
+};
+
+module.exports = function plugin(userConf) {
+  conf = { ...defaultConf, ...userConf };
+
+  this.main.s3Fetch = function s3Fetch(next) {
+    const data = this.data[conf.pluginFieldName];
+
+    AWS.config.update({
+      accessKeyId: conf['buckets'][data[conf.bucketField]].accessKeyId,
+      secretAccessKey: conf['buckets'][data[conf.bucketField]].secretAccessKey
+    });
+
+    saveObjectToFile(data[conf.bucketField], data[conf.nameField], data[conf.outputFileField] + data[conf.nameField]).then((res) => {
+      const remoteMd5 = res.etag.replace(/"/g, '');
+
+      fs.readFile(data[conf.outputFileField] + data[conf.nameField], function (err, resFile) {
+
+        if (!remoteMd5) {
+          throw 'cannot get remote md5';
+        }
+
+        if (remoteMd5 !== checksum(resFile)) {
+          throw 'files checksum not match';
+        }
+
+        next();
+      })
+    }).catch((err) => {
+      console.log(err, 'file fetch error');
+    });
   }
 
+  this.main.s3Delete = function s3Fetch(next) {
+    const data = this.data[conf.pluginFieldName];
 
- this.awsFetch = function(data) {
-   let downloadedFilePath = '/tmp'
-    if(!Array.isArray(data)) { data = [data]; }
+    AWS.config.update({
+      accessKeyId: conf['buckets'][data[conf.bucketField]].accessKeyId,
+      secretAccessKey: conf['buckets'][data[conf.bucketField]].secretAccessKey
+    });
 
-   const start = async () => {
-      await asyncForEach(data, async (set) => {
-
-	if(!set.provider|!set.accessKeyId|!set.secretAccessKey|!set.region|!set.remoteFilename) {
-	      set.error = true;
-      	} else {
-
-       	  if(!set.localFilename){
-      	    set.localFilename = set.remoteFilename;
-      	  }
-
-	  if(!set.downloadedFilePath){
-      	    set.downloadedFilePath = downloadedFilePath;
-      	  }
-
-	  var aws = require('aws-s3-promisified')({
-	    accessKeyId: set.accessKeyId,
-	    secretAccessKey: set.secretAccessKey
-	  });
-
-      	  let bucketName = set.id || 'fetchBucket'
-	  var res = await aws.saveObjectToFile(bucketName, set.localFilename, set.downloadedFilePath);
-	  if (!res) { set.error = true; } else { set.error = false; set.localFilename = set.downloadedFilePath+"/"+set.localFilename}
-        }
-     });
-     return data;
-   }
-   start().then(function() {
-     // Apply Data
-     this.data(data);
-     // Return Chain
-     return this;
-   }.bind(this));
-
- }
-
+    deleteObject(data[conf.bucketField], data[conf.nameField]).then((res) => {
+      next();
+    }).catch((err) => {
+      console.log(err, 'error deleting file');
+    });
+  }
 
 }

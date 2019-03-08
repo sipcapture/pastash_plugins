@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-s3-promisified": "^2.0.0"
+    "aws-sdk": "^2.416.0",
+    "bluebird": "^3.5.3"
   }
 }
