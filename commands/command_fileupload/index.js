@@ -9,13 +9,13 @@ let conf;
 const defaultConf = {
   pluginFieldName: 'FieTransfer',
   port: 21,
-  usarname: 'anonymous',
+  user: 'anonymous',
 };
 
 module.exports = function plugin(userConf) {
   conf = { ...defaultConf, ...userConf };
 
-  this.main.uploadFile = function uploadFile(next) {
+  this.main.uploadFile = async function uploadFile(next) {
     const data = this.data[conf.pluginFieldName];
 
     var ftp = new PromiseFtp();
@@ -25,11 +25,13 @@ module.exports = function plugin(userConf) {
       user: conf.usarname,
       password: conf.password
     })
-      .then(() => {
-        ftp.put(
+      .then(async () => {
+        await ftp.mkdir(data[conf.outputFileField], true);
+
+        await ftp.put(
           data[conf.inputFileField] + data[conf.nameField],
           data[conf.outputFileField] + data[conf.nameField]);
-      }).then(() => {
+
         ftp.list(data[conf.outputFileField]).then((list) => {
           const size = list.find(it => it.name === data[conf.nameField]).size;
           if (size !== data[conf.sizeField]) {
@@ -39,6 +41,7 @@ module.exports = function plugin(userConf) {
             next();
           }
         });
-      });
+
+      })
   }
 }
