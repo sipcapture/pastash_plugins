@@ -22,7 +22,7 @@ module.exports = function plugin(userConf) {
     ftp.connect({
       host: conf.host,
       port: conf.port,
-      user: conf.usarname,
+      user: conf.user,
       password: conf.password
     })
       .then(async () => {

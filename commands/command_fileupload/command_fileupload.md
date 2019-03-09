@@ -10,7 +10,7 @@ Config example:
     "nameField": "fileName",
     "sizeField": "fileSize",
     "host": "host",
-    "usarname": "usarname",
+    "user": "username",
     "password": "password",
     "port": "port"
 }
