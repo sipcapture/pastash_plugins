@@ -76,22 +76,30 @@ module.exports = function plugin(userConf) {
     });
 
     saveObjectToFile(data[conf.bucketField], data[conf.nameField], data[conf.outputFileField] + data[conf.nameField]).then((res) => {
+
       const remoteMd5 = res.etag.replace(/"/g, '');
 
-      fs.readFile(data[conf.outputFileField] + data[conf.nameField], function (err, resFile) {
+      fs.readFile(data[conf.outputFileField] + data[conf.nameField], (err, resFile) => {
 
         if (!remoteMd5) {
-          throw 'cannot get remote md5';
+          this.data.error = conf.pluginFieldName + ' plugin error cannot get remote md5';
+          self.emit('output', this.data);
+          return;
         }
 
+        this.data[self.fieldResultList].push({ md5: remoteMd5 });
+
         if (remoteMd5 !== checksum(resFile)) {
-          throw 'files checksum not match';
+          this.data.error = conf.pluginFieldName + ' plugin error files checksum not match';
+          self.emit('output', this.data);
+          return;
         }
 
         next();
       })
     }).catch((err) => {
-      console.log(err, 'file fetch error');
+      this.data.error = conf.pluginFieldName + ' plugin error file fetch error; ' + err;
+      self.emit('output', this.data);
     });
   }
 
@@ -106,7 +114,8 @@ module.exports = function plugin(userConf) {
     deleteObject(data[conf.bucketField], data[conf.nameField]).then((res) => {
       next();
     }).catch((err) => {
-      console.log(err, 'error deleting file');
+      this.data.error = conf.pluginFieldName + ' error deleting file; ' + err;
+      self.emit('output', this.data);
     });
   }
 

@@ -9,36 +9,53 @@ let conf;
 const defaultConf = {
   pluginFieldName: 'FieTransfer',
   port: 21,
-  usarname: 'anonymous',
+  user: 'anonymous',
 };
 
 module.exports = function plugin(userConf) {
   conf = { ...defaultConf, ...userConf };
 
-  this.main.uploadFile = function uploadFile(next) {
+  this.main.uploadFile = async function uploadFile(next) {
     const data = this.data[conf.pluginFieldName];
 
     var ftp = new PromiseFtp();
     ftp.connect({
       host: conf.host,
       port: conf.port,
-      user: conf.usarname,
+      user: conf.user,
       password: conf.password
     })
-      .then(() => {
-        ftp.put(
+      .then(async () => {
+        await ftp.mkdir(data[conf.outputFileField], true);
+
+        await ftp.put(
           data[conf.inputFileField] + data[conf.nameField],
           data[conf.outputFileField] + data[conf.nameField]);
-      }).then(() => {
+
         ftp.list(data[conf.outputFileField]).then((list) => {
-          const size = list.find(it => it.name === data[conf.nameField]).size;
-          if (size !== data[conf.sizeField]) {
-            console.log('file size not to match');
+          const file = list.find(it => it.name === data[conf.nameField] + '54564');
+
+          if (!file) {
+            ftp.end();
+            this.data.error = conf.pluginFieldName + ' plugin error file not uploaded';
+            self.emit('output', this.data);
+            return;
+          }
+
+          if (file.size !== data[conf.sizeField]) {
+            ftp.end();
+            this.data.error = conf.pluginFieldName + ' plugin error file size not to match';
+            self.emit('output', this.data);
+            return;
           } else {
             ftp.end();
             next();
           }
         });
-      });
+
+      }).catch((err) => {
+        this.data.error = conf.pluginFieldName + ' plugin error connecting server; ' + err;
+        self.emit('output', this.data);
+      })
   }
 }
