@@ -33,15 +33,29 @@ module.exports = function plugin(userConf) {
           data[conf.outputFileField] + data[conf.nameField]);
 
         ftp.list(data[conf.outputFileField]).then((list) => {
-          const size = list.find(it => it.name === data[conf.nameField]).size;
-          if (size !== data[conf.sizeField]) {
-            console.log('file size not to match');
+          const file = list.find(it => it.name === data[conf.nameField] + '54564');
+
+          if (!file) {
+            ftp.end();
+            this.data.error = conf.pluginFieldName + ' plugin error file not uploaded';
+            self.emit('output', this.data);
+            return;
+          }
+
+          if (file.size !== data[conf.sizeField]) {
+            ftp.end();
+            this.data.error = conf.pluginFieldName + ' plugin error file size not to match';
+            self.emit('output', this.data);
+            return;
           } else {
             ftp.end();
             next();
           }
         });
 
+      }).catch((err) => {
+        this.data.error = conf.pluginFieldName + ' plugin error connecting server; ' + err;
+        self.emit('output', this.data);
       })
   }
 }
