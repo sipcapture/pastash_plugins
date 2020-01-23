@@ -34,10 +34,10 @@ OutputPostgres.prototype.start =function(callback) {
     if (this.db) {
         try {
 	    var pgConnectionString = 'postgres://' + this.username + ':' + this.password + '@' + this.host + ":" + this.port + '/' + this.db;
-            logger.info('Initializing Outpu Postgres:',this.db);
+            logger.info('Initializing Output Filter Postgres:',this.db);
 		pg.connect(pgConnectionString, function(err, client, done) {
         	  if(err) {
-       		     return console.error('error fetching client from pool', err);
+       		     return console.error('Error Fetching Client from Pool!', err);
        		  }
 		  this.client = client;
 		  this.done = done;
@@ -46,16 +46,16 @@ OutputPostgres.prototype.start =function(callback) {
 		                function(err,result) {
 		                    done();
 		                    if (err) {
-		                        logger.error("error creating table!", err);
+		                        logger.error("Error Creating Table!", err);
 		                    }
 				    if (this.debug) logger.info(result);
 				}
 		        );
 		  }
 	        });
-        } catch(e){ logger.error('Failed Initializing Filter Postgres',e); }
+        } catch(e){ logger.error('Failed to Initialize Output Filter Postgres!',e); }
     }
-    logger.info('Initialized Filter Postgres');
+    logger.info('Initialized Output Filter Postgres');
     callback();
 }
 
@@ -76,7 +76,7 @@ OutputPostgres.prototype.process = function(data) {
 };
 
 OutputPostgres.prototype.close = function(callback) {
-    logger.info('Closing postgres');
+    logger.info('Closing Output Filter Postgres');
     this.done();
     callback();
 };
