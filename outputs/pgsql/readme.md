@@ -7,9 +7,6 @@ This plugin is used insert JSONB data into Postgres.
 
 ### Config using logstash format:
 ````
-        optional_params: ['database', 'table', 'query', 'host', 'user', 'password', 'port', 'create_table', 'id'],
-
-
 output {
   if [type] == nginx {
     pgsql {
