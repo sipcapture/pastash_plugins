@@ -4,12 +4,7 @@ var base_output = require('@pastash/pastash').base_output,
 var THIS ;
 var pg = require('pg');
 
-function uuidv4() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  );
-}
-
+const { uuid } = require('uuidv4');
 
 function OutputPostgres() {
     base_output.BaseOutput.call(this);
@@ -62,7 +57,7 @@ OutputPostgres.prototype.start =function(callback) {
 util.inherits(OutputPostgres, base_output.BaseOutput);
 
 OutputPostgres.prototype.process = function(data) {
-	var id = uuidv4();
+	var id = uuid();
 	if (data[this.id]) id = data[this.id];
 	this.client.query('insert into ' + this.table + '(id, data) values($1, $2)',
                 [id, data],
