@@ -3,6 +3,7 @@ var base_output = require('@pastash/pastash').base_output,
     util = require('util');
 var THIS ;
 var pg = require('pg');
+var pool = {};
 
 const { uuid } = require('uuidv4');
 
@@ -32,9 +33,11 @@ OutputPostgres.prototype.start =function(callback) {
             logger.info('Initializing Output Filter Postgres:',this.db);
 		pg.connect(pgConnectionString, function(err, client, done) {
         	  if(err) {
+		     pool.err = err;
        		     return console.error('Error Fetching Client from Pool!', err);
        		  }
 		  this.client = client;
+		  pool.client = client;
 		  this.done = done;
 		  if (this.create_table){
 			this.client.query('CREATE TABLE IF NOT EXISTS ' + this.table + '(id TEXT NOT NULL PRIMARY KEY, data JSONB NOT NULL);',
@@ -59,7 +62,11 @@ util.inherits(OutputPostgres, base_output.BaseOutput);
 OutputPostgres.prototype.process = function(data) {
 	var id = uuid();
 	if (data[this.id]) id = data[this.id];
-	this.client.query('insert into ' + this.table + '(id, data) values($1, $2)',
+	if (!pool && !pool.client) {
+		logger.error("no pg client available", pool.err);
+		return;
+	}
+	pool.client.query('insert into ' + this.table + '(id, data) values($1, $2)',
                 [id, data],
                 function(err,result) {
                     if (err) {
@@ -72,7 +79,7 @@ OutputPostgres.prototype.process = function(data) {
 
 OutputPostgres.prototype.close = function(callback) {
     logger.info('Closing Output Filter Postgres');
-    this.done();
+    pool.client.done();
     callback();
 };
 
