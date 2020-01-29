@@ -3,6 +3,8 @@ var base_output = require('@pastash/pastash').base_output,
     util = require('util');
 var THIS ;
 var pg = require('pg');
+const { Pool, Client } = require('pg')
+
 var pool = {};
 
 const { uuid } = require('uuidv4');
@@ -31,30 +33,37 @@ OutputPostgres.prototype.start =function(callback) {
         try {
 	    var pgConnectionString = 'postgres://' + this.username + ':' + this.password + '@' + this.host + ":" + this.port + '/' + this.db;
             logger.info('Initializing Output Filter Postgres:',this.db);
-		pg.connect(pgConnectionString, function(err, client, done) {
-        	  if(err) {
-		     pool.err = err;
-       		     return console.error('Error Fetching Client from Pool!', err);
-       		  }
-		  this.client = client;
-		  pool.client = client;
-		  this.done = done;
-		  if (this.create_table){
-			this.client.query('CREATE TABLE IF NOT EXISTS ' + this.table + '(id TEXT NOT NULL PRIMARY KEY, data JSONB NOT NULL);',
-		                function(err,result) {
-		                    done();
-		                    if (err) {
-		                        logger.error("Error Creating Table!", err);
-		                    }
-				    if (this.debug) logger.info(result);
-				}
-		        );
-		  }
-	        });
+		pool.client = new Client({
+		  connectionString: pgConnectionString,
+		})
+		pool.client.on('error', err => { pool.client.end(); pool.client.connect(); }  );
+
+		pool.client
+		  .connect()
+		  .then(() => console.log('DB connected!'))
+		  .catch(err => logger.error('DB connection error!', err.stack))
+		  .then(() => {
+			  if (this.create_table){
+				pool.client.query('CREATE TABLE IF NOT EXISTS ' + this.table + '(id TEXT NOT NULL PRIMARY KEY, data JSONB NOT NULL);',
+			                function(err,result) {
+			                    done();
+			                    if (err) {
+			                        logger.error("Error Creating Table!", err);
+			                    }
+					    if (this.debug) logger.info(result);
+					}
+			        );
+			  }
+		  })
+
         } catch(e){ logger.error('Failed to Initialize Output Filter Postgres!',e); }
     }
     logger.info('Initialized Output Filter Postgres');
     callback();
+}
+
+var createDatabase = function(){
+
 }
 
 util.inherits(OutputPostgres, base_output.BaseOutput);
@@ -72,7 +81,7 @@ OutputPostgres.prototype.process = function(data) {
                     if (err) {
                         logger.error("error inserting!", this.table, err);
                     }
-		    if (this.debug) logger.info(result);
+		    if (this.debug) logger.info("Successful insert!",result);
 		}
         );
 };
