@@ -10,7 +10,7 @@ This plugin is used insert JSONB data into Postgres.
 output {
   if [type] == nginx {
     pgsql {
-      database => mydatabase
+      db => mydatabase
       table => test
       host => localhost
       port => 5432
