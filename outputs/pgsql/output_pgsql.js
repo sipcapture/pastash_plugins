@@ -31,7 +31,7 @@ OutputPostgres.prototype.start =function(callback) {
     THIS =  this;
     if (this.db) {
         try {
-	    var pgConnectionString = 'postgres://' + this.username + ':' + this.password + '@' + this.host + ":" + this.port + '/' + this.db;
+	    var pgConnectionString = 'postgres://' + this.user + ':' + this.password + '@' + this.host + ":" + this.port + '/' + this.db;
             logger.info('Initializing Output Filter Postgres:',this.db);
 		pool.client = new Client({
 		  connectionString: pgConnectionString,
@@ -46,7 +46,6 @@ OutputPostgres.prototype.start =function(callback) {
 			  if (this.create_table){
 				pool.client.query('CREATE TABLE IF NOT EXISTS ' + this.table + '(id TEXT NOT NULL PRIMARY KEY, data JSONB NOT NULL);',
 			                function(err,result) {
-			                    done();
 			                    if (err) {
 			                        logger.error("Error Creating Table!", err);
 			                    }
@@ -88,7 +87,7 @@ OutputPostgres.prototype.process = function(data) {
 
 OutputPostgres.prototype.close = function(callback) {
     logger.info('Closing Output Filter Postgres');
-    pool.client.done();
+    pool.client.end();
     callback();
 };
 
