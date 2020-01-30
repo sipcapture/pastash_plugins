@@ -13,7 +13,7 @@ function OutputPostgres() {
     base_output.BaseOutput.call(this);
     this.mergeConfig({
         name: 'postgres',
-        optional_params: ['db', 'table', 'query', 'host', 'user', 'password', 'port', 'create_table', 'id'],
+        optional_params: ['db', 'table', 'query', 'host', 'user', 'password', 'port', 'create_table', 'create_db', 'id'],
         default_values: {
             'db' : 'test',
             'table' : 'pastash',
@@ -22,6 +22,7 @@ function OutputPostgres() {
             'user': 'root',
             'password': 'admin',
             'id': 'id',
+	    'create_db': false,
 	    'create_table': false
         },
         start_hook: this.start,
@@ -43,6 +44,16 @@ OutputPostgres.prototype.start =function(callback) {
 		  .then(() => console.log('DB connected!'))
 		  .catch(err => logger.error('DB connection error!', err.stack))
 		  .then(() => {
+			  if (this.create_db){
+				pool.client.query('CREATE DATABASE ' + this.db + ';',
+			                function(err,result) {
+			                    if (err) {
+			                        logger.error("Error Creating Database!", err);
+			                    }
+					    if (this.debug) logger.info(result);
+					}
+			        );
+			  }
 			  if (this.create_table){
 				pool.client.query('CREATE TABLE IF NOT EXISTS ' + this.table + '(id TEXT NOT NULL PRIMARY KEY, data JSONB NOT NULL);',
 			                function(err,result) {
