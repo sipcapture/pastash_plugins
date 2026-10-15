@@ -56,7 +56,7 @@ FilterAppRtpProxy.prototype.process = function(data) {
    if (!data.message) return data;
    var line = data.message;
    if (line.indexOf('received command ') !== -1) {
-	var regex = /received command \"(.*)\s+(US|U|L)c(.*?)[\s](.*?)[\s]+/g;
+	var regex = /received command \"(\S+)\s+(US|U|L)c([0-9,]+)\s+(\S+)/;
         var ip = regex.exec(line);
 	if (!ip || !ip[1]) return;
 	var token = ip[1];
@@ -77,13 +77,18 @@ FilterAppRtpProxy.prototype.process = function(data) {
 	return;
 
    } else if (line.indexOf('new session on IPv4 port ') !== -1) {
-	var regex = /new session on IPv4 port\s+(.*) created.*tag\s+(.*)/g;
-        var ip = regex.exec(line);
-	if (!ip || !ip[1]) return;
-	ipcache['port_'+ip[1]] = ip[2];
+	var portPrefix = 'new session on IPv4 port ';
+	var portRest = line.slice(line.indexOf(portPrefix) + portPrefix.length);
+	var createdAt = portRest.indexOf(' created');
+	var tagAt = portRest.indexOf('tag ');
+	if (createdAt === -1 || tagAt === -1) return;
+	var portNum = portRest.slice(0, createdAt).trim();
+	var tag = portRest.slice(tagAt + 4).trim().split(/\s+/)[0];
+	if (!portNum || !tag) return;
+	ipcache['port_'+portNum] = tag;
 
    } else if (line.indexOf('rtpc_doreply: sending reply ') !== -1) {
-	var regex = /rtpc_doreply: sending reply \"(.*)\s+([0-9.].*)\\n"/g;
+	var regex = /rtpc_doreply: sending reply \"(\S+)\s+([0-9.]+)\\n"/;
         var ip = regex.exec(line);
 	if (!ip || !ip[1]) return;
 	// get port -> token lookup
@@ -100,7 +105,7 @@ FilterAppRtpProxy.prototype.process = function(data) {
 	this.emit('output', data.message);
 
    } else if (line.indexOf('sending reply ') !== -1) {
-	var regex = /sending reply \"(.*)\s+(.*?)[\s](.*?)#012/g;
+	var regex = /sending reply \"(\S+)\s+(\S+)\s+(\S+)#012/;
         var ip = regex.exec(line);
 	if (!ip || !ip[1]) return;
 	var token = ip[1];
@@ -114,9 +119,17 @@ FilterAppRtpProxy.prototype.process = function(data) {
 	this.emit('output', data.message);
  
    } else if (line.indexOf('is cleaned up') !== -1) {
-	var regex = /session on ports (.*)\/(.*?)[\s]is cleaned up/g;
-        var ip = regex.exec(line);
-	ip.forEach(function(port){
+	var cleanupPrefix = 'session on ports ';
+	var cleanupAt = line.indexOf(cleanupPrefix);
+	if (cleanupAt === -1) return;
+	var cleanupRest = line.slice(cleanupAt + cleanupPrefix.length);
+	var slashAt = cleanupRest.indexOf('/');
+	var suffixAt = cleanupRest.indexOf(' is cleaned up');
+	if (slashAt === -1 || suffixAt === -1 || slashAt >= suffixAt) return;
+	var portA = cleanupRest.slice(0, slashAt).trim();
+	var portB = cleanupRest.slice(slashAt + 1, suffixAt).trim();
+	if (!portA || !portB) return;
+	[portA, portB].forEach(function(port){
 		logger.info('clearing up port '+port, ipcache['port_'+port]);
 		Object.keys(ipcache).forEach(function(key){
 			if (ipcache[key] && ipcache[key].media && ipcache[key].media[0].port == port) {
