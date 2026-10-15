@@ -51,8 +51,8 @@ FilterAppAvaya.prototype.process = function(data) {
       full = full.replace(/#015#012/g, '\r\n');
       full = full.replace(/#011/g, '');
       full = full.replace(/#012--------------------/g, '');
-      full = full.replace(/-->/g, '');
-      full = full.replace(/<--/g, '');
+      full = full.split('-->').join('');
+      full = full.split('<--').join('');
       
       // SPLIT FIELDS
       var split = full.split(/#012/);
